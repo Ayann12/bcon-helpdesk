@@ -48,6 +48,35 @@ class TicketController extends Controller
         }
     }
 
+    public function show($code)
+    {
+        try {
+            $ticket = Ticket::where('code', $code)->first();
+
+            if (!$ticket) {
+                return response()->json([
+                    'message' => 'Tiket tidak ditemukan'
+                ], 404);
+            }
+
+            if (auth()->user()->role == 'user' && $ticket->user_id != auth()->user()->id) {
+                return response()->json([
+                    'message' => 'Anda tidak diperbolehkan mengakses tiket ini'
+                ], 403);
+            }
+
+            return response()->json([
+                'message' => 'Tiket berhasil ditampilkan',
+                'data' => new TicketResource($ticket)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi Kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function store(TicketStoreRequest $request)
     {
         $data = $request->validated();

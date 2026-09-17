@@ -26,7 +26,7 @@ class DashboardController extends Controller
             ->count();
 
         $avgResolutionTime = Ticket::whereBetween('created_at', [$currentMonth, $endOfMonth])
-            ->where('status', '!=', 'resolved')
+            ->where('status', 'resolved')
             ->whereNotNull('completed_at')
             ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_time'))
             ->value('avg_time') ?? 0;
@@ -42,7 +42,7 @@ class DashboardController extends Controller
             'total_tickets' => $totalTickets,
             'active_tickets' => $activeTickets,
             'resolved_tickets' => $resolvedTickets,
-            'avg_resolution_time' => $avgResolutionTime,
+            'avg_resolution_time' => round($avgResolutionTime, 1),
             'status_distribution' => $statusDistribution,
         ];
 
